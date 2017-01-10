@@ -75,7 +75,71 @@ fruitBox.add(new Fruit());
 fruitBox.add(new Apple()); // 이상없다. void add(T item)
 ```
 
+------
+
+## Enum
+
+열거형이란 같은 객체를 하나의 클래스로 묶는 역할을 한다.
+
+예를들어 이렇게 코드 절약을 할 수 있다.
+
+```java
+class Card{
+  // static final int Clover = 0;
+  // static final int Heart = 1;
+  // ...
+  // final int kind;
+  enum Kind{Clover, Heart, Diamond, Spade}
+  final Kind Kind;
+}
+```
+
+열거형은 상수 간 비교시 == 사용이 가능하다. 다른 비교연산자(<,>)는 안된다. 따라서 compareTo를 사용하자.
+
+switch문의 조건식에도 상수로 사용이 가능한데 이때는 열거형이름은 적지 않고 상수 이름만 적어야 한다. `dir.East`은 안되고  `East`는 된다.
+
+#### 출력
+
+enum에 담긴 값을 출력할 때는 `.values()`를 호출하여 배열에 담아 반환한다. 
+
+```java
+Direction[] dArr = Direction.values();
+for(Direction d : dArr)
+  s.out.printf("%s=%d%n", d.name(), d.original());
+```
+
+original 메서드는 열거형 상수가 정의된 순서(index와 같은)를 반환하며 0부터 시작된다. 하지만 이는 내부적 용도로 사용되는 것이 바람직하다. 따라서 값을 지정해 주는 것이 좋다.
+
+```java
+enum Direction{
+  EAST(1), SOUTH(5), WEST(-1), NORTH(10);
+  
+  private final int value; // 정수를 저장할 인스턴스 변수 추가
+  Direction(int value){this.value = value}
+  public int getValue(){return value;} // 외부에서 접근할 수 없게 final로 변수선언했으니 get메서드 작성
+}// 이렇게 하나의 클래스처럼 만들어주면 name을 저장하면서 index도 지정할 수 있다.
+```
+
+열거형 같은경우 사실 상수 하나하나가 다 새로운 객체이다. 위의 코드를 예로 들으면 EAST, SOUTH, WEST, NORTH 는 모두 Direction의 객체인 것이다. `static final Direction EAST = new Direction("EAST");`
 
 
 
+------
+
+## annotation
+
+애너테이션은 프로그램의 소스코드 안에 다른 프로그램을 위한 정보를 미리 약속된 형식으로 포함시킨 것이다.
+
+소스코드의 주석인 /** ~ */안에 @이렇게 생긴 친구들을 이야기한다.
+
+쉬운 예로 @Override가 있다.
+
+```java
+class Parent {void parentMethod(){}}
+class Child extends Parent{ void parentmethod(){}} // m이 소문자다.
+```
+
+이런경우 override가 아니라 그냥 다른 이름의 메서드를 선언한 꼴이 된다. 단순 오타로 일어난 실수이나 이를 컴파일러가 알 수 있는 방법은 없다. 따라서 디버깅 작업 시 찾아내야 하는데 찾기가 쉽지 않을게 눈에 선하다.
+
+하지만 메서드 앞에 @Override를 붙이게 되면 컴파일러가 '아 이거 오버라이드하려는 거구나 근데 왜 부모 클래스에 같은 메서드가 없지..? 이거 이상해요! '라고 에러를 발생시킨다.
 
