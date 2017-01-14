@@ -133,3 +133,107 @@ suspend로 정지 resume으로 재개할 수 있다. stop은 호출즉시 쓰레
 `try{th1.join() // 현재 실행중인 쓰레드가 쓰레드 th1의 작업이 끝날때까지 기다린다.}catch(Exception e){}`
 
 sleep()과 유사한 점이 많은데 static이 아니라는 점에서 다르다.
+
+### Synchronize
+
+멀티쓰레드 프로세스의 경우 A가 작업할 때 B가 A가 현재 사용하는 자원을 변경할 경우 A의 작업의 결과가 의도했던 것과 다를 수 있다. 그 예로 A가 계좌조회를 하는데 B가 그 사이에 돈을 뽑았거나 잔액을 변경할 경우 예상했던 결과가 아닐 수 있다. 일이 동시에 일어나서 생기는 문제다. 따라서 이럴 경우 어떠한 작업을 하나의 단위로 묶어 중간에 다른 쓰레드가 영향을 주지 못하게 해야 할 것이다. 
+
+이를 lock이라고 하고 그 영역을 critical section이라고 한다. 데이터베이스의 transaction과 비슷한 개념이라고 생각하자. 자바에서는 synchronized블럭과 locks, atomic 패키지 이렇게 다양한 방법으로 이를 지원한다.
+
+#### synchronized
+
+키워드를 이용하는 방법이다. 두가지 방식이 있다.
+
+`public synchronized void calcSum(){}`  메서드 동기화
+
+`synchronized (referenceVal){}`  블럭 동기화
+
+{}을 이용하여 critical section을 만들고 그 안의 작업을 수행할 때 lock을 얻어 작업을 수행한다. 작업이 끝나면 lock을 반납한다. 이때 critical section은 최소화하여 프로그램의 성능을 생각 해야한다.
+
+#### wait(), notify()
+
+앞의 sync는 동기화하여 공유 데이터를 보호하는 것이었다. 하지만 만일 계좌에 돈이 부족해서 출금을 못할 경우 쓰레드는 락을 보유한 채로 돈이 들어오기까지 기다리고 있을 것이다. 이럴 경우 하는일 없이 프로그램이 반복문을 계속 돌 것이다. 
+
+이걸 개선하기 위해 wait()과 notify()가 생겼다. 코드를 수행하다 어느 조건에서는 wait()을 실행해서 락을 반납하고 기다리다가, 어떤 조건이 해결되면 notify()해서 알려주는 것이다. lock을 반납하였다가 재진입해서 프로그램을 실행하는 것이다. 
+
+하지만 이 두 메서드도 한계가 있다. starvation과 race condition이다. starvation은 notify()때문에 생긴다. 이 통지라는 메서드는 waiting pool에 있는 쓰레드들 중 랜덤하게 아무 쓰레드나 호출한다. 만일 계속해서 다른 쓰레드를 호출할 경우 프로그램 실행시간이 계속 증가하는 것이다. 이는 notifyAll()메서드로 해결은 가능하다. 이는 모든 쓰레드를 que로 부르는 것이다. 이는 race condition을 초래한다. que에 들어가지 않아도 될 쓰레드까지 들어가 프로그램을 돌릴 것이다.
+
+#### Lock&Condition
+
+이를 해결하기 위해 Lock클래스가 나왔다. 
+
+* ReentrantLock - 일반적인 lock
+* ReentrantReadWriteLock - 읽기에는 공유적, 쓰기에는 배타적
+* StampedLock - ReadWrite에 낙관적 lock 추가
+
+이렇게 종류가 세가지가 있다. 
+
+ReentrantReadWriteLock은 읽기와 쓰기의 lock을 제공한다. 읽기는 내용을 변경하지 않으므로 서로 동시에 쓰레드가 사용해도 상관이 없다. write의 경우에만 배타적으로 lock을 준다.
+
+앞에서 사용한 sync는 brace로 묶기에 예외가 발생하거나 프로그램이 끝나면 자동으로 lock을 반납한다. 그러나 Lock클래스는 그렇지 않다. unlock() 으로 풀어주어야 한다.
+
+수동으로 lock을 해제해야 하기에 예외가 발생하거나 return으로 critical section을 빠져나간다면 lock이 풀리지 않을 수 있으므로 항상 try-final로 감싸는것이 일반적이다. 
+
+위의 문제들을 해결하는 방식은 간단하다. 조건을 주는 것이다. condition을 주어 기다리게 만드는거다. 요리사-손님의 관계를 생각해보자. 손님이 없으면 요리사는 기다리고 주문이 들어오면 만든다. 손님은 주문을하고 요리사가 만들때까지 음식을 기다려야 한다. 요리사와 손님이 둘다 waiting pool에 들어갈 수 도 있고, 다른 주문을 한 손님들끼리 섞일 수 도 있다. 따라서 condition을 주면된다.
+
+사용법은 아래와 같고 wait()&notify()는 await()&signal()로 사용한다.
+
+```java
+private ReentrantLock lock = new ReentrantLock();
+private Condition forCook = lock.newCondition();
+private Condition forCust1 = lock.newCondition();
+private Condition forCust2 = lock.newCondition();
+
+forCook.await(); //요리사쓰레드 기다리게하기.
+forCust1.signal() //손님 1 깨우기
+```
+
+Stamped는 lock을 걸거나 풀 때 스탬프를 사용한다. 또한 optimistic reading lock을 추가하였다. 이게 뭐냐면 만일 reading lock이 걸려있다면 write lock이 필요하더라도 reading이 끝나야 writing의 lock이 걸리는 것이다.
+
+#### volatile
+
+컴퓨터의 각 코어는 메모리에서 코어의 캐시로 값을 읽어온다. 그런 뒤 그 캐시값을 이용해서 작업을 하게 되어있다. 헌데 멀티 코어 컴퓨터의 경우 값을 읽어왔는데 다른 코어가 작업하면서 그 값을 변경할 수 있다. 그렇게 되면 결과가 달라질 것이다. 이를 막기위해 volatile을 붙여주면 변수의 값을 읽어올 때 캐시가 아닌 메모리에서 직접 읽어오게 된다. 그래서 불일치가 해결된다. 하지만 이것이 동기화를 의미하는 것은 아니다! 단지 atomic을 의미할 뿐이다. 
+
+참고로 final에는 volatile을 붙일 수 없다. 상수는 변하지 않으므로 Thread-Safe하기 때문이다.붙일 이유가 없다.
+
+#### Fork & Join
+
+하나의 작업을 여러 쓰레드로 나누는걸 도와주는 프레임워크다. 
+
+* RecursiveAction   non-return시 사용
+* RecursiveTask       return시 사용
+
+두 클래스는 추상클래스다. 추상메서드는 단 하나만 있는데 compute()다. 사용법은 아래와 같다.
+
+```java
+class SumTask extends RecursiveTask<Long>{
+  // ...
+  public Long compute(){
+    //...
+  }
+  //...
+}
+
+psvm{
+  ForkJoinPool pool = new ForkJoinPool();  // 프레임워크에서 제공하는 쓰레드 풀.
+  SumTask task = new SumTask();
+  Long result = pool.invoke(task); // run()-start()관계처럼 compute()-invoke()관계.
+}
+```
+
+##### compute()구현
+
+쓰레드를 나누어 메서드를 만들어주어야 한다. 거의 정형인데 재귀함수를 이용한다.
+
+```java
+public Long compute(){   // from부터 to까지 더하는 메서드
+  long half = (from+to) / 2;   // 절반을 구한뒤 두개로 나눠준다.
+  SumTask left = new SumTask(from, half);
+  SumTask right = new SumTask(half+1, to);
+  
+  left.fork();  // 절반 중 왼쪽을 que에 넣는다.
+  return right.compute() + left.join();    // 오른쪽은 재귀함수로 다시 반을 나눈다.
+  // join은 que에 넣은 결과를 반환하는 것이다. 
+}
+```
+
