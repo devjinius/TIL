@@ -139,3 +139,9 @@ typeof a; //number
 *그렇다면 typeof 연산 결과의 타입은 무엇일까?*
 
 `typeof typeof 42; // "string"` 어느정도 예상했지만 역시 String이다.
+
+
+
+*참고문헌*
+
+* 카일 심슨,  YOU DON`T KNOW JS - 타입과 문법 스코프와 클로저, 한빛미디어, 2017
