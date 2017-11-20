@@ -123,6 +123,27 @@ if(window.DEBUG){
 
 하지만 이런 방식은 node.js와 같이 전역객체가 없는 환경이라면 불가능 하다. 
 
+#### undefined만 할 수 있는 특별한 짓
+
+전역 스코프에서 undefined라는 예약어(변수)에 값을 할당할 수 있다.
+
+```java
+undefined = 2;
+```
+
+이렇기 때문에 undefined란 이름의 지역변수를 만들 수 있는데 제발 하지 말자
+
+#### undefined와 void 연산자
+
+void는 자바에서 흔히 보던 문법이다. 자바스크립트에서 void는 무효화라는 뜻이다. 값이 무효화되면 undefined로 간다. 기존의 값은 건드리지 않으며 연산 후 값은 복구할 수 없다.
+
+```javascript
+var a = 42;
+console.log(void a, a) // undefined 42
+```
+
+따라서 undefined라는 값을 얻고 싶다면 `void 0`처럼 쓰면 된다. 그럼 그냥 undefined로 쓰면 되지 않을까? 왜 굳이 이런걸 쓰나 싶은 생각이 든다. 그 이유는 어떤 표현식의 연산 결괏값이 없다(undefined)라는 것을 명확히 하는데 쓰인다.
+
 ## 변수와 값의 타입
 
 동적 언어인 자바스크립트는 타입이 있어서 타입 언어다. 하지만 정적 언어와는 다른점이 있다. 값에는 타입이 있지만 변수에는 타입이 없다.
@@ -140,7 +161,45 @@ typeof a; //number
 
 `typeof typeof 42; // "string"` 어느정도 예상했지만 역시 String이다.
 
+## 특수 숫자
 
+### NaN
+
+Not a Number다. 그렇지만 Not a Number는 명확한 표현이 아니며 Invalid Number가 더 정확한 표현이다. 생기는 경우는 다음과 같다.
+
+```javascript
+var a = 2 / "foo"; // NaN
+
+// 그런데 말이다.
+typeof a === "number"; // true
+```
+
+a는 숫자가 아니다. 그런데 숫자랑 타입을 비교하니 참이다!
+
+```javascript
+a == NaN; // false
+a === NaN; // false
+```
+
+? 이게뭘까? NaN 을 비교하면 false다. `NaN!=NaN`이다. 즉 자신과도 같지 않은 이상한 값이다. 
+
+그래서 NaN임을 확인할 때는 `isNaN(a) // true`의 방식을 사용한다. 근데 이것도 올바른 방법은 아니다. isNaN은 이거 숫자가 아니야?라고 묻는거기 때문에 `isNaN("hi") // true`다. 문자열을 넣어도 true다.
+
+결국 해결사로 ES6부터 *`Number.isNaN()`*라는 친구가 나왔다!!! **여기서 얻어가는 제일 중요한 사실은 isNaN()이라는 코드를 사용하면 시한폭탄을 설치한 셈이된다** 
+
+**Number.isNaN()**과 새로나온 Object.is(a, NaN)을 사용하자
+
+### 무한
+
+별로 쓸일은 없지만 간단하게만 정리해보자
+
+```javascript
+var a = 1/0;   // Infinity
+var b = -1/0   // -Infinity
+// 다른 언어에서는 Divided by Zero에러가 날 것!
+```
+
+음의 무한대와 양의 무한대가 따로 있다. 그럼 무한을 무한으로 나누면 어떻게 될까? 결과는 NaN이다.
 
 *참고문헌*
 
