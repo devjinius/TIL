@@ -43,35 +43,35 @@ rotate(data, -5)    =>    {1, 2, 3, 4, 5}
 ```java
 public static Object[] rotate(Object[] data, int n) {
 		
-		//#1 arrayList로 변환
-		ArrayList listData = new ArrayList(Arrays.asList(data));
-		int size = listData.size()-1; // 배열의 마지막 index 저장
-		
-  		//#2 0이면 반환
-		if(n == 0) {return data;}
-		else if (n > 0) {
-		
-              // n번만큼 반복
-			while (n>0){
-				
-				Object temp = listData.get(size);    //temp에 맨 뒤 값 저장
-				listData.remove(size);               //방금 추출한 값 삭제
-				listData.add(0, temp);               //맨 앞에 저장
-				n--;
-			}
-		} else {
+	//#1 arrayList로 변환
+	ArrayList listData = new ArrayList(Arrays.asList(data));
+	int size = listData.size()-1; // 배열의 마지막 index 저장
+
+	//#2 0이면 반환
+	if(n == 0) {return data;}
+	else if (n > 0) {
+
+		// n번만큼 반복
+		while (n>0){
 			
-			while (n<0){
-				
-				Object temp = listData.get(0);       //temp에 맨 앞 값 저장 
-				listData.remove(0);                  //방금 추출한 값 삭제
-				listData.add(size, temp);            //맨 뒤에 저장
-				n++;
-			}
+			Object temp = listData.get(size);    //temp에 맨 뒤 값 저장
+			listData.remove(size);               //방금 추출한 값 삭제
+			listData.add(0, temp);               //맨 앞에 저장
+			n--;
 		}
+	} else {
 		
-		// arrayList를 object[]로 변환 후 반환
-		return listData.toArray();
+		while (n<0){
+			
+			Object temp = listData.get(0);       //temp에 맨 앞 값 저장 
+			listData.remove(0);                  //방금 추출한 값 삭제
+			listData.add(size, temp);            //맨 뒤에 저장
+			n++;
+		}
 	}
+
+	// arrayList를 object[]로 변환 후 반환
+	return listData.toArray();
+}
 ```
 
