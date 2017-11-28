@@ -1,6 +1,14 @@
 # 강제변환
 
-자바스크립트에서 type conversion or type coercion이라고하는 타입변환을 설명해보자. 
+자바스크립트에서 type conversion or type coercion이라고하는 타입변환을 설명해보자.
+
+* [Casting과 Coercion](#Casting과 Coercion)
+* [추상연산](#추상연산)
+  * [ToString](#ToString)
+  * [JSON.stringify](#JSON.stringify)
+  * [ToNumber](#ToNumber)
+  * [ToBoolean](#ToBoolean)
+* [명시적 강제변환](#명시적 강제변환)
 
 ## Casting And Coercion
 
@@ -94,3 +102,58 @@ var b = {
 ```
 
 a는 맞고 b는 틀렸다. 
+
+### ToNumber
+
+숫자가 아닌 값을 숫자로 변환한다. `"42" -> 42`로 바꾸는거는 쉽게 생각할 수 있다만 `undefined -> NaN` 과 같은 것은 쉽게 생각 못할 수도 있다.  저번에도 얘기했듯, [NaN](./type.md#NaN)은 숫자다.
+
+- true = 1
+- false = 0
+- undefined = NaN
+- null = 0
+- 객체의 경우 원시값으로 변환 후 결과값을 ToNumber()를 실행하여 변환한다
+  - 이 때 valueOf메서드가 구현이 되어있다면 이 것을 사용한다.
+
+### ToBoolean
+
+흔히 1은 true, 0은 false라고 여긴다. 하지만 엄연히 다르다. 숫자는 숫자고 불리언은 불리언이다.
+
+#### Falsy값
+
+이 책에서는 Falsy라는 친구를 사용한다. 이는 불리언으로 강제 변환 시 false가 되는 값이다. 
+
+* undefined
+* null
+* false
+* +0, -0, NaN
+* ""
+
+는 모두 Falsy다. 나머지는 모두 true를 반환한다. 이 값만 외우면 된다. 
+
+#### Falsy객체
+
+객체는 모두 Truthy하다. 그런데 falsy object는 무엇일까?
+
+```javascript
+var a = new Boolean(false);
+var b = new Number(0);
+var c = new String("");
+```
+
+세 값은 모두 true다. 그 이유는 객체로 감쌌기 때문이다. `typeof(a)`는 object다. 위에 나온 5가지 경우를 제외하고는 모두 참이다. 그렇다면 falsy 객체는 무엇인가?
+
+겉보기엔 평범한 객체지만 불리언으로 강제 변환하면 false가 되는 애들이다. 모든 객체는 강제 변환 시 true지만 내부적으로 false로 만든 애들이 있다. 바로 document.all이다.  이 특별한 친구는 비표준이고, 문법에 맞지않는 예외라고 보면 된다.
+
+생겨난 배경은 IE기반의 브라우저에서 많이 사용했던 비표준 코딩인데 후에 레거시로 남게되었고 이를 돌아가게 하려고 true로 두었다. `if(document.all){}` 이런식으로 사용하는 낡은 코드들이 잘 돌아가게 하기 위해 남겨진 버그다.
+
+이것을 제외하고 모두 true를 반환한다.
+
+```javascript
+var a = "false";
+var b = "0";
+var c = [];
+var d = {};
+var e = function() {};
+```
+
+모두 true를 반환하게 된다.
