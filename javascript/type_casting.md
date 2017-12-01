@@ -2,12 +2,12 @@
 
 자바스크립트에서 type conversion or type coercion이라고하는 타입변환을 설명해보자.
 
-* [ Casting과 Coercion](#casting-And-Coercion)
+* [Casting과 Coercion](#casting-and-coercion)
 * [추상연산](#추상연산)
-  * [ToString](#toString)
+  * [ToString](#tostring)
   * [JSON.stringify](#json.stringify)
-  * [ToNumber](#toNumber)
-  * [ToBoolean](#toBoolean)
+  * [ToNumber](#tonumber)
+  * [ToBoolean](#toboolean)
 * [명시적 강제변환](#명시적-강제변환)
 
 ## Casting And Coercion

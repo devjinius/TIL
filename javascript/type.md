@@ -170,7 +170,7 @@ typeof a; //number
 
 ## 특수 숫자
 
-### nan
+### NaN
 
 Not a Number다. 그렇지만 Not a Number는 명확한 표현이 아니며 Invalid Number가 더 정확한 표현이다. 생기는 경우는 다음과 같다.
 

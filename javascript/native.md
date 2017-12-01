@@ -1,5 +1,15 @@
 # Native
 
+* [Native란](#native란)
+* [내부 클래스](#내부-클래스)
+* [Boxing](#boxing)
+* [Unboxing](#unboxing)
+* [배열](#배열)
+* [기타](#기타-네이티브)
+* [Native Prototype](#네이티브-프로토타입)
+
+### Native란
+
 네이티브의 기본 정의는 특정환경(클라이언트의 프로그램 ex)browser)에 종속되지 않은 ECMA script의 내장객체를 말한다. 예를들어 Object, Math, Function, Array, Window, Button이 있다면 이 중 Window와 Button은 네이티브가 아니다.
 
 네이티브는 사실 내장함수로 String(), Number(), Array() 이런걸 말한다.
