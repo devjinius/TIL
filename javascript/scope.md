@@ -153,7 +153,7 @@ with문은 넘겨진 객체를 가지고 새로운 렉시컬 스코프를 생성
 
 ## 함수와 블록 스코프
 
-### 함수 스코프 기반의 자바스크립트
+함수 스코프 기반의 자바스크립트
 
 자바스크립트는 함수 기반 스코프를 사용한다고 익히 알고있다. 일반적인 다른 언어들과는 다르게 if(){}문과 같은 블럭은 스코프로 취급되지 않으며 오직 함수만이 스코프를 생성한다고 알고있다. 하지만 이는 어느정도 사실이 아니다.
 
@@ -277,9 +277,176 @@ setTimeout(function foo(){
 }, 1000);
 ```
 
+#### IIFE
 
+즉시호출함수표현식이라고한다.(Immedeately Invoked Function Expression) 위에서 봤던 (function foo() {})()와 같은 패턴을 말한다. 첫번째 ()는 함수를 표현식으로, 두 번째 ()는 함수를 실행시키게 된다. 위에서도 봤듯 기명으로 사용해도 아무 지장이 없다. IIFE를 사용할 때도 기명으로 사용하도록 하자.
 
+### 스코프 역할의 블록
 
+[함수 스코프 기반의 자바스크립트](#함수-스코프-기반의-자바스크립트) 여기서 자바스크립트는 함수 기반의 스코프를 가진다고 했다. 하지만 함수 기반의 스코프만을 가지는 것은 아니라고 했는데 이제 알아보자.
+
+다른 많은 언어들은 블록 스코프를 지원한다. 예를 들면 이런 것이다.
+
+```javascript
+for(var i = 0; i < 10; i++) {
+  console.log(i);
+}
+```
+
+저기서 보통의 언어들은 변수 i가 저 블록에서만 작동하게끔 되어있다. 즉 변수를 최대한 가까운 스코프에 묶어 작은 유효범위를 가지게 하는  것이다. 하지만 자바스크립트는 보통의 언어들과 조금 다른 스코프를 가진다. 
+
+```javascript
+var foo = true;
+
+if(foo) {
+  var bar = foo *2;
+  bar = something(bar);
+  console.log(bar);
+}
+```
+
+변수 bar는 오직 if문 안에서만 사용하므로, bar를 if 블록 안에 선언하는 것은 타당하다. 그러나 사실 이는 가짜스코프다. 자바스크립트에서 if문의 {} 블록은 스코프의 역할을 하지 못한다.
+
+for문도 마찬가지다.
+
+외견상으로 자바스크립트는 블록 스코프를 지원하지 않지만 몇가지 방법은 있다.
+
+#### 두 가지 사소한 방법
+
+with와 try/catch다. with의 경우 없어지는 예시기 때문에 적지 않겠다. 곧 사라질 것이다.
+
+try/catch문에서 catch부분의 블록은 스코프를 가진다.
+
+```javascript
+try{
+  undefined();  // error
+} catch(err) {
+  console.log(err);
+}
+
+console.log(err);  // error
+```
+
+이 경우 변수 err은 catch의 블록에서만 작동하게 된다.
+
+### let
+
+중요한 친구는 이 친구다. ES6에서부터 도입된 기능으로 let이 있다. let은 var와 비슷하게 변수를 선언하는 방식이다. 다만 let은 선언된 변수를 아무 블록의 스코프에 붙이다. 다시말해서, 자바스크립트는 블록 스코프를 지원하지는 않는다. 다만 let을 사용하면 명시적이진 않지만 가까운 블록을 스코프처럼 만들어주는 기능을 한다.
+
+```javascript
+var foo = true;
+
+if (foo) {
+  let bar = foo * 2;
+  console.log(bar);
+}
+
+console.log(bar); // error
+```
+
+이렇게 말이다. if 문의 블록에 변수 bar는 스코프처럼 안으로 들어가게 된다.  비 명시적이라 헷갈릴 수 있겠지만 블록 스코프를 사용했다는 점이 고무적이다. 이제 블록을 명시적으로 바꿔주면 헷갈리는 문제를 해결 할 수 있게 된다.
+
+```javascript
+var foo = true;
+
+if (foo) {
+  {
+  	let bar = foo * 2;
+  	console.log(bar);
+  }
+}
+
+console.log(bar); // error
+```
+
+이렇게 만들면 bar는 if{} 안의 {}에서만 존재하는 변수가 된다. 이렇게하면 나중의 리팩토링에도 편해질 것이다. let의 경우 호이스팅의 효과를 받지 않는다. 호이스팅은 [호이스팅과 스코프클로저](./hoisting-and-closure.md) 여기에서 확인할 수 있다. 호이스팅이 되지 않기 때문에 아래와 같은 현상이 벌어진다.
+
+```javascript
+{
+  console.log(bar);     // error
+  let bar = 2;    
+}
+```
+
+블록스코프가 유용한 다른 이유는 클로저와 가비지콜렉션과 관령이 있다. 클로저와 관련된 것도 [호이스팅과 스코프클로저](./hoisting-and-closure.md) 여기에 기술하도록 하겠다.
+
+#### let 반복
+
+for의 경우 `var i`를 만드는 것 보다 `let`을 사용하면 유용하게 사용할 수 있다.
+
+```javascript
+for(var i = 0; i < 10; i++) {
+  console.log(i);
+}
+console.log(i); // 10
+
+for(let j = 0; j < 10; j++) {
+  console.log(j);
+}
+console.log(j); // error
+```
+
+이런식으로 말이다. 이와 관련된 것 역시 [호이스팅과 스코프클로저](./hoisting-and-closure.md)에서 조금 더 깊게 설명할 것이다.
+
+리팩토링에 대해 좀 알아보자. var를 let으로 바꾸는 것은 스코프 때문에 조금의 노력이 필요할 수 있다.
+
+```javascript
+var foo = true; baz = 10;
+
+if (foo) {
+  var bar = 3;
+  if (baz > bar) {
+    console.log(baz);
+  }
+}
+```
+
+ 라는 코드가 있다면
+
+```javascript
+var foo = true; baz = 10;
+
+if (foo) {
+  var bar = 3;
+}
+
+if (baz > bar) {
+  console.log(baz);
+}
+```
+
+라고 바꿀 수 있을 것이다. 그런데 블록 스코프를 사용한다면 조심해야 한다.
+
+```javascript
+var foo = true; baz = 10;
+
+if (foo) {
+  let bar = 3;
+  if (baz > bar) {
+    console.log(baz);
+  }
+}
+```
+
+요렇게 바뀌어야 할 것이다. 단순히 var를 let으로 바꿨다가는 에러가 날 것이다.
+
+### const
+
+ES6에서 const도 추가 되었다. 이는 java의 final과 비슷하다. 상수다. 그런데 얘도 let처럼 블록 스코프를 생성한다.
+
+```javascript
+var foo = true;
+
+if (foo) {
+  var a = 2;
+  const b = 3;
+  a = 3;
+  b = 4; //error!
+}
+
+console.log(a);
+console.log(b); //error!!!
+```
 
 
 
