@@ -34,7 +34,7 @@ Accept-Language: ko-kr, en-us
 
 클라이언트 측에서 네고시에이션을 하는 방식입니다. 예를들어 브라우저에 표시된 선택지 중에서 유저가 수동으로 선택하는 방식입니다. javascript를 이용하여 OS의 종류에 따라 PC용과 스마트폰용 웹페이지를 자동으로 전환하는 것과 같은 방식입니다.
 
-###Transparent Negotiation
+### Transparent Negotiation
 
 위 두가지를 혼합한 방식으로 각각 네고시에이션을 실시합니다
 
