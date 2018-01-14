@@ -37,3 +37,7 @@ end
 루비에서 ?로 끝나는경우 true나 false입니다.
 
 따라서 `"input".include? "s"` 라고 물을경우 evaluate하면 false가 됩니다.
+
+#### 번외
+
+`string_to_change.gsub!(/s/, "th")` 의 경우 `gsub!`은 global substitution으로 전부 바꾸며 정규표현식을 허용합니다.
