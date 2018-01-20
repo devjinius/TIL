@@ -225,3 +225,80 @@ end
 
 [참고자료](https://stackoverflow.com/questions/4370960/what-is-attr-accessor-in-ruby)
 
+### 상속
+
+모든 클래스는 Object의 자손이다. 따라서 아무것도 하지 않은 클래스에도 58개의 메서드가 들어있다. 
+
+```ruby
+class Dog
+end
+
+def test_objects_have_methods
+  fido = Dog.new
+  assert fido.methods.size > 0
+  # Object.methods.length == 111
+  # 상속받은 메서드는 58개(fido.methods.size)
+end
+```
+
+### 클래스 메서드
+
+static과 같다. `클래스명.메서드명`으로 호출하는 메서드다. 메서드 정의는 두 가지 방법으로 할 수 있다. 클래스명, self 둘 다 가능하고 클래스 안, 밖 모두 가능하다.
+
+```ruby
+class Dog2
+  def wag
+    :instance_level_wag
+  end
+end
+
+# 클래스 밖에서 정의했다.
+def Dog2.wag
+  :class_level_wag
+end
+
+def test_since_classes_are_objects_you_can_define_singleton_methods_on_them_too
+  assert_equal :class_level_wag, Dog2.wag
+end
+```
+
+``` ruby
+class Dog
+  # 클래스 안에서 정의했다.
+  def Dog.a_class_method       #이 부분에서 Dog를 self로 바꿔도 무관하다.
+    :dogs_class_method
+  end
+end
+
+def test_you_can_define_class_methods_inside_the_class
+  assert_equal :dogs_class_method, Dog.a_class_method
+end
+```
+
+물론 클래스 밖에서는 self의 사용이 안 된다.
+
+또 다른 한가지 방법이 있습니다. 바로 싱글턴 객체를 이용하여 클래스 메서드처럼 약간의 trick을 사용하는 방법입니다.
+
+```ruby
+class Dog
+  class << self
+    def another_class_method
+      :still_another_way
+    end
+  end
+end
+
+def test_heres_still_another_way_to_write_class_methods
+  assert_equal :still_another_way, Dog.another_class_method
+end
+```
+
+이런 방식입니다. `Dog.another_class_method`처럼 클래스명.메서드명으로 사용하는것은 같습니다만 `class << self` 를 사용했습니다. eigenclass라고 하며 정확히는 클래스의 싱글턴 객체에 메서드를 추가한 것 입니다.
+
+배열에서도 `<<`를 push 대용으로 사용했었는데 여기서는 다른 개념입니다.
+
+1.9.2버전부터는 obj.singleton_class로 사용한다고 합니다.
+
+참고로 싱글턴의 경우 상속시에도 메서드가 남게됩니다.
+
+[관련자료](https://codequizzes.wordpress.com/2014/04/11/singleton-classes-in-ruby-aka-eigenclasses/)
