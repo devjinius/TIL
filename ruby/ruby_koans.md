@@ -62,9 +62,9 @@ hash는 순서가 없습니다. 따라서 데이터의 순서가 다르더라도
 def test_default_value_is_the_same_object
   hash = Hash.new([])
 
+  # `<<`` array에 추가한다는 의미입니다
   hash[:one] << "uno"
   hash[:two] << "dos"
-  # `<<`` array에 추가한다는 의미입니다
 
   assert_equal ["uno", "dos"], hash[:one]
   assert_equal ["uno", "dos"], hash[:two]
@@ -298,7 +298,5 @@ end
 배열에서도 `<<`를 push 대용으로 사용했었는데 여기서는 다른 개념입니다.
 
 1.9.2버전부터는 obj.singleton_class로 사용한다고 합니다.
-
-참고로 싱글턴의 경우 상속시에도 메서드가 남게됩니다.
 
 [관련자료](https://codequizzes.wordpress.com/2014/04/11/singleton-classes-in-ruby-aka-eigenclasses/)
