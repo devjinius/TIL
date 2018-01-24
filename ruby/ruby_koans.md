@@ -2,7 +2,7 @@
 
 ## Objects
 
-###Difference between to_s and inspect in Ruby
+### Difference between to_s and inspect in Ruby
 
 `nil.to_s == ""` 
 
@@ -62,9 +62,9 @@ hash는 순서가 없습니다. 따라서 데이터의 순서가 다르더라도
 def test_default_value_is_the_same_object
   hash = Hash.new([])
 
+  # `<<`` array에 추가한다는 의미입니다
   hash[:one] << "uno"
   hash[:two] << "dos"
-  # `<<`` array에 추가한다는 의미입니다
 
   assert_equal ["uno", "dos"], hash[:one]
   assert_equal ["uno", "dos"], hash[:two]
@@ -138,7 +138,7 @@ if (i % 2 == 0) {
 
 ### iteration
 
-####map과 collect의 차이
+#### map과 collect의 차이
 
 ```ruby
 # Creates a new array containing the values returned by the block.
@@ -158,7 +158,7 @@ end
 
 [stack overflow 자료](https://stackoverflow.com/questions/5254732/difference-between-map-and-collect-in-ruby)
 
-###select 와 find_all의 미묘한 차이점
+### select 와 find_all의 미묘한 차이점
 
 ```ruby
 def test_select_selects_certain_items_from_an_array
@@ -177,7 +177,7 @@ select와 find_all은 모두 iteration에 if문을 더한 것입니다. 배열�
 
 [stack overflow 자료](https://stackoverflow.com/questions/20999192/is-find-all-and-select-the-same-thing)
 
-###inject()
+### inject()
 
 정의는 inject(initial) { |memo, obj| block } 입니다. obj를 반복하는데 memo라는 변수를 initial로 만들어서 사용할 수 있습니다. 반환값은 memo입니다.
 
@@ -298,7 +298,5 @@ end
 배열에서도 `<<`를 push 대용으로 사용했었는데 여기서는 다른 개념입니다.
 
 1.9.2버전부터는 obj.singleton_class로 사용한다고 합니다.
-
-참고로 싱글턴의 경우 상속시에도 메서드가 남게됩니다.
 
 [관련자료](https://codequizzes.wordpress.com/2014/04/11/singleton-classes-in-ruby-aka-eigenclasses/)
