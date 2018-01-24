@@ -130,3 +130,6 @@ public class Stream {
 
 이렇게 하게되면 Copy.txt라는 파일이 생기면서 복사되게 됩니다.
 
+### DataStream
+
+이 친구는 byte단위가 아닌 기본 자료형의 단위로 읽고 쓸 수 있습니다. 
